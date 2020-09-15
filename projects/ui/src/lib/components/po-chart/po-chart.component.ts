@@ -19,6 +19,7 @@ import { Subject } from 'rxjs';
 import { PoChartBaseComponent } from './po-chart-base.component';
 import { PoChartColors } from './po-chart-colors.constant';
 import { PoChartDonutComponent } from './po-chart-types/po-chart-donut/po-chart-donut.component';
+import { PoChartLineComponent } from './po-chart-types/po-chart-line/po-chart-line.component';
 import { PoChartDynamicTypeComponent } from './po-chart-types/po-chart-dynamic-type.component';
 import { PoChartGaugeComponent } from './po-chart-types/po-chart-gauge/po-chart-gauge.component';
 import { PoChartPieComponent } from './po-chart-types/po-chart-pie/po-chart-pie.component';
@@ -58,6 +59,7 @@ export class PoChartComponent extends PoChartBaseComponent implements AfterViewI
   private mappings = {
     [PoChartType.Donut]: PoChartDonutComponent,
     [PoChartType.Gauge]: PoChartGaugeComponent,
+    [PoChartType.Line]: PoChartLineComponent,
     [PoChartType.Pie]: PoChartPieComponent
   };
 

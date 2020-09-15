@@ -2,9 +2,10 @@ import { ElementRef, ViewChild, Directive } from '@angular/core';
 
 import { Subject } from 'rxjs';
 
-import { PoChartGaugeSerie } from './po-chart-gauge/po-chart-gauge-series.interface';
 import { PoChartType } from '../enums/po-chart-type.enum';
+import { PoChartGaugeSerie } from './po-chart-gauge/po-chart-gauge-series.interface';
 import { PoDonutChartSeries } from './po-chart-donut/po-chart-donut-series.interface';
+import { PoLineChartSeries } from './po-chart-line/po-chart-line-series.interface';
 import { PoPieChartSeries } from './po-chart-pie/po-chart-pie-series.interface';
 
 const Padding: number = 24;
@@ -27,10 +28,12 @@ export abstract class PoChartDynamicTypeComponent {
   colors: Array<string>;
   height: number;
   innerRadius: number = 0;
-  onSerieClick: Subject<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie> = new Subject();
-  onSerieHover: Subject<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie> = new Subject();
+  onSerieClick: Subject<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie | PoLineChartSeries> = new Subject();
+  onSerieHover: Subject<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie | PoLineChartSeries> = new Subject();
+  series: Array<any> = [];
   svgElement: HTMLObjectElement;
   svgHeight: number;
+  svgWidth: number;
   target: HTMLInputElement & EventTarget;
   tooltipElement: HTMLObjectElement;
   tooltipText: string;

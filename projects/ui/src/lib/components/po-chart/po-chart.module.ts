@@ -9,6 +9,7 @@ import { PoChartGaugeComponent } from './po-chart-types/po-chart-gauge/po-chart-
 import { PoChartGaugeTextContentComponent } from './po-chart-types/po-chart-gauge/po-chart-gauge-text-content/po-chart-gauge-text-content.component';
 import { PoChartLegendComponent } from './po-chart-legend/po-chart-legend.component';
 import { PoChartPieComponent } from './po-chart-types/po-chart-pie/po-chart-pie.component';
+import { PoChartLineComponent } from './po-chart-types/po-chart-line/po-chart-line.component';
 
 /**
  * @description
@@ -23,7 +24,8 @@ import { PoChartPieComponent } from './po-chart-types/po-chart-pie/po-chart-pie.
     PoChartGaugeComponent,
     PoChartGaugeTextContentComponent,
     PoChartPieComponent,
-    PoChartLegendComponent
+    PoChartLegendComponent,
+    PoChartLineComponent
   ],
   exports: [PoChartComponent]
 })
