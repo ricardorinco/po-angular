@@ -10,15 +10,19 @@ const Padding: number = 24;
   templateUrl: '../po-chart-dynamic-type.component.html'
 })
 export class PoChartLineComponent extends PoChartDynamicTypeComponent implements OnInit {
-  // categories = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  categories = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+  categories = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // categories = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
 
   maxValue: number;
   minValue: number;
+  digitsPrecision: number = 0;
   points: Array<any> = [];
 
-  axisXLabels: Array<number> = [];
-  numberOfAxisXGuides: number = 5;
+  svgInternalAreaHeight;
+  svgInternalAreaWidth;
+
+  axisXLabels: Array<number | string> = [];
+  numberOfHorizontalGuides: number = 5;
 
   constructor(private renderer: Renderer2) {
     super();
@@ -51,9 +55,10 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     this.renderer.setAttribute(svgElement, 'preserveAspectRatio', `xMidYMin meet`);
     this.renderer.setAttribute(svgElement, 'class', 'po-chart-svg-element');
 
-    svgGroupElement.appendChild(this.drawXAxis());
-    // svgGroupElement.appendChild(this.drawOuterYAxis());
-    // svgGroupElement.appendChild(this.drawInnerYAxis());
+    svgGroupElement.appendChild(this.drawAxisX());
+    svgGroupElement.appendChild(this.drawAxisXLabels());
+    svgGroupElement.appendChild(this.drawOuterAxisY());
+    svgGroupElement.appendChild(this.drawInnerAxisY());
 
     svgElement.appendChild(svgGroupElement);
     this.svgContainer.nativeElement.appendChild(svgElement);
@@ -62,156 +67,160 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     // this.createTexts();
   }
 
-  drawXAxis() {
+  drawAxisX() {
     const svgGroupElement = this.createSvgElement('g');
-
-    console.log('axisXLabels', this.axisXLabels);
 
     this.axisXLabels.forEach((label, index) => {
       const svgPolylineElement = this.createSvgElement('polyline');
 
-      this.renderer.setAttribute(svgPolylineElement, 'key', `line-axis-${index}`);
+      this.renderer.setAttribute(svgPolylineElement, 'key', `line-axis-${index + 1}`);
       this.renderer.setAttribute(svgPolylineElement, 'stroke', '#999');
       this.renderer.setAttribute(svgPolylineElement, 'strokeWidth', '0.2');
-      this.renderer.setAttribute(svgPolylineElement, 'points', this.setPolylineXPoints(index));
+      this.renderer.setAttribute(svgPolylineElement, 'points', this.setAxisXPoints(index));
 
       svgGroupElement.appendChild(svgPolylineElement);
     });
-    console.log('svgGroupElement', svgGroupElement);
 
     return svgGroupElement;
   }
 
-  drawOuterYAxis() {
+  // drawAxisLabels() {
+  //   const svgGroupElement = this.createSvgElement('g');
+
+  //   for (let i = 0; i <= this.numberOfScales; i++) {
+  //     // aqui é necessário fazer a lógica para formatação de escalas. item não feito.
+  //     const currentScaleAxisSize = i / this.numberOfScales;
+
+  //     svgGroupElement.appendChild(this.createScaleLabels(currentScaleAxisSize, i));
+  //   }
+
+  //   return svgGroupElement;
+  // }
+
+  drawAxisXLabels() {
     const svgGroupElement = this.createSvgElement('g');
 
-    let index = 0;
+    this.axisXLabels.forEach((axisLabel, index) => {
+      svgGroupElement.appendChild(this.createAxisLabels(axisLabel, index));
+    });
 
-    while (index < 2) {
+    return svgGroupElement;
+  }
+
+  createAxisLabels(axisLabel, index) {
+    const svgTextElement = this.createSvgElement('text');
+    const points = this.calculateAxisXLabelsPoints(axisLabel, index);
+
+    svgTextElement.textContent = axisLabel.toString();
+
+    this.renderer.setAttribute(svgTextElement, 'key', `axis-label-value-${index + 1}`);
+    this.renderer.setAttribute(svgTextElement, 'x', points[0]);
+    this.renderer.setAttribute(svgTextElement, 'y', points[1]);
+    this.renderer.setAttribute(svgTextElement, 'text-anchor', 'end');
+    this.renderer.setAttribute(svgTextElement, 'dominant-baseline', 'middle');
+    this.renderer.setAttribute(svgTextElement, 'font-weight', '600');
+    this.renderer.setAttribute(svgTextElement, 'font-size', '12');
+
+    return svgTextElement;
+  }
+
+  calculateAxisXLabelsPoints(axisLabel, index) {
+    const textPadding = 8;
+    const xCoordinate = Padding * 3 - textPadding;
+
+    const ratio = index / (this.numberOfHorizontalGuides - 1);
+    const yCoordinate = this.svgInternalAreaHeight - this.svgInternalAreaHeight * ratio + Padding;
+
+    return [xCoordinate.toString(), yCoordinate.toString()];
+
+    // const y = height - padding + FONT_SIZE * 2;
+  }
+
+  // const startX = Padding * 3;
+  // const endX = this.svgWidth - Padding;
+
+  // const ratio = index / (this.numberOfHorizontalGuides - 1);
+  // const yCoordinate = this.svgInternalAreaHeight - (this.svgInternalAreaHeight * ratio) + Padding;
+
+  // return `${startX}, ${yCoordinate}, ${endX}, ${yCoordinate}`;
+
+  drawOuterAxisY() {
+    const svgGroupElement = this.createSvgElement('g');
+
+    [...Array(2)].forEach((_, index) => {
       const svgPolylineElement = this.createSvgElement('polyline');
 
-      this.renderer.setAttribute(svgPolylineElement, 'key', `line-axis-${index}`);
+      this.renderer.setAttribute(svgPolylineElement, 'key', `line-axis-${index + 1}`);
       this.renderer.setAttribute(svgPolylineElement, 'stroke', '#999');
       this.renderer.setAttribute(svgPolylineElement, 'strokeWidth', '0.2');
       this.renderer.setAttribute(svgPolylineElement, 'points', this.setPolylineYOuterPoints(index));
 
       svgGroupElement.appendChild(svgPolylineElement);
-
-      index = index + 1;
-    }
+    });
 
     return svgGroupElement;
   }
 
-  setPolylineYOuterPoints(index) {
-    const startY = Padding;
-    const endY = this.svgHeight - Padding * 2;
-
-    console.log('this.svgHeight', this.svgHeight);
-
-    let xCoordinate;
-
-    if (index === 0) {
-      xCoordinate = Padding * 3;
-    } else {
-      xCoordinate = this.svgWidth - Padding;
-    }
-
-    // else if (index === this.categories.length) {
-
-    // } else {
-    // const xCoordinate = Padding + ratio * (this.svgWidth - Padding * 2);
-
-    // }
-
-    return `${xCoordinate}, ${startY}, ${xCoordinate}, ${endY}`;
-  }
-
-  drawInnerYAxis() {
+  drawInnerAxisY() {
     const svgGroupElement = this.createSvgElement('g');
 
     this.categories.forEach((label, index) => {
       const svgPolylineElement = this.createSvgElement('polyline');
 
-      this.renderer.setAttribute(svgPolylineElement, 'key', `line-axis-${index}`);
+      this.renderer.setAttribute(svgPolylineElement, 'key', `line-axis-${index + 1}`);
       this.renderer.setAttribute(svgPolylineElement, 'stroke', '#999');
       this.renderer.setAttribute(svgPolylineElement, 'strokeWidth', '0.2');
       this.renderer.setAttribute(svgPolylineElement, 'points', this.setPolylineYPoints(index));
 
       svgGroupElement.appendChild(svgPolylineElement);
     });
-    console.log('svgGroupElement', svgGroupElement);
 
     return svgGroupElement;
   }
 
-  setPolylineYPoints(index) {
-    const startY = Padding;
-
-    const endY = this.svgHeight - Padding * 2;
-
-    const ratio = (index + 1) / this.categories.length;
-    const internalPlotableArea = this.svgWidth - Padding * 4;
-    const xCoordinate = ratio * internalPlotableArea;
-
-    return `${xCoordinate}, ${startY}, ${xCoordinate}, ${endY}`;
-  }
-
-  setPolylineXPoints(index) {
+  setAxisXPoints(index) {
     const startX = Padding * 3;
     const endX = this.svgWidth - Padding;
 
-    const ratio = index / (this.numberOfAxisXGuides - 1);
-    const internalPlotableArea = this.svgHeight - Padding * 3;
-
-    let percentage = ((index + 1 / this.numberOfAxisXGuides) * 100).toFixed(2);
-
-    console.log('index', index);
-    console.log('numberOfAxisXGuides', this.numberOfAxisXGuides);
-
-    console.log('ratio', ratio);
-    console.log('percentage', percentage);
-    const yCoordinate = internalPlotableArea - internalPlotableArea * ratio + Padding;
+    const ratio = index / (this.numberOfHorizontalGuides - 1);
+    const yCoordinate = this.svgInternalAreaHeight - this.svgInternalAreaHeight * ratio + Padding;
 
     return `${startX}, ${yCoordinate}, ${endX}, ${yCoordinate}`;
   }
 
-  // const startX = Padding * 3;
-  // const endX = this.svgWidth - Padding;
+  setPolylineYOuterPoints(index) {
+    const startY = Padding;
+    const endY = this.svgHeight - Padding * 2;
 
-  // const ratio = (index + 1) / (this.numberOfAxisXGuides + 1);
-  // const yCoordinate = this.svgHeight - (this.svgHeight * ratio) + Padding;
+    const outerXCoordinate = index === 0 ? Padding * 3 : this.svgWidth - Padding;
 
-  // return `${startX}, ${yCoordinate}, ${endX}, ${yCoordinate}`;
-
-  defineAxisXLabels(maxValue: number, axisXSteps) {
-    let index = 0;
-
-    while (index < this.numberOfAxisXGuides) {
-      const measurement = Math.ceil((maxValue / axisXSteps) * index);
-      this.axisXLabels = [...this.axisXLabels, measurement];
-
-      index = index + 1;
-    }
+    return `${outerXCoordinate}, ${startY}, ${outerXCoordinate}, ${endY}`;
   }
 
-  // setPolylinePoints(columnAngle) {
-  //   const positionsXY = [
-  //     [0, 0],
-  //     [this.polarToX(columnAngle, 0.5), this.polarToY(columnAngle, 0.5)]
-  //   ];
+  setPolylineYPoints(index) {
+    const startY = Padding;
+    const endY = this.svgHeight - Padding * 2;
 
-  //   return positionsXY.map(point => point[0].toFixed(4) + ',' + point[1].toFixed(4)).join(' ');
-  // }
+    const ratio = index / (this.categories.length - 1);
+    const xCoordinate = Padding * 5 + ratio * this.svgInternalAreaWidth;
 
-  // setSvgGroupElementPosition(svgGroupElement) {
-  //   this.renderer.setStyle(svgGroupElement, 'transform', `translate(${this.centerX || 0}px, ${this.height / 2 || 0}px)`);
-  // }
+    return `${xCoordinate}, ${startY}, ${xCoordinate}, ${endY}`;
+  }
+
+  defineAxisXLabels(maxValue: number, numberOfHorizontalGuides: number) {
+    [...Array(numberOfHorizontalGuides)].forEach((_, index: number) => {
+      const AxisXLabelsMeasurement = (this.maxValue * (index / (numberOfHorizontalGuides - 1))).toFixed(
+        this.digitsPrecision
+      );
+
+      this.axisXLabels = [...this.axisXLabels, AxisXLabelsMeasurement];
+    });
+  }
 
   generalSetup() {
     this.calculateSVGContainerSize(this.chartWrapper, this.chartHeader, this.chartLegend);
     this.calculateSeriesMaxValue();
-    this.defineAxisXLabels(this.maxValue, this.numberOfAxisXGuides);
+    this.defineAxisXLabels(this.maxValue, this.numberOfHorizontalGuides);
     this.calculatePoints();
   }
 
@@ -220,6 +229,12 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
 
     this.svgHeight = svgContainerHeightCalc <= 0 ? 0 : svgContainerHeightCalc;
     this.svgWidth = chartWrapperElement - Padding * 2;
+
+    // Coordenadas para área de plotagem dos pontos das séries e também para área interna do grid:
+    // Largura que subtrai a largura do container SVG pelo padding lateral, área de labelY e margem interna do grid.
+    this.svgInternalAreaWidth = this.svgWidth - Padding * 8;
+    // Altura que subtrai a altura do container SVG pelo padding superior, inferior e área de labelX.
+    this.svgInternalAreaHeight = this.svgHeight - Padding * 3;
   }
 
   calculateSeriesMaxValue() {
