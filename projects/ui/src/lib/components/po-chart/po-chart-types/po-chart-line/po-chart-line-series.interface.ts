@@ -13,7 +13,7 @@ export interface PoLineChartSeries {
   category: string;
 
   /** Define a lista de valores para a série. */
-  value: Array<number>;
+  values: Array<number>;
 
   /**
    * @optional

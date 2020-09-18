@@ -57,8 +57,12 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
 
     svgGroupElement.appendChild(this.drawAxisX());
     svgGroupElement.appendChild(this.drawAxisXLabels());
+
     svgGroupElement.appendChild(this.drawOuterAxisY());
     svgGroupElement.appendChild(this.drawInnerAxisY());
+    svgGroupElement.appendChild(this.drawAxisYLabels());
+
+    svgGroupElement.appendChild(this.drawSeries());
 
     svgElement.appendChild(svgGroupElement);
     this.svgContainer.nativeElement.appendChild(svgElement);
@@ -84,30 +88,17 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     return svgGroupElement;
   }
 
-  // drawAxisLabels() {
-  //   const svgGroupElement = this.createSvgElement('g');
-
-  //   for (let i = 0; i <= this.numberOfScales; i++) {
-  //     // aqui é necessário fazer a lógica para formatação de escalas. item não feito.
-  //     const currentScaleAxisSize = i / this.numberOfScales;
-
-  //     svgGroupElement.appendChild(this.createScaleLabels(currentScaleAxisSize, i));
-  //   }
-
-  //   return svgGroupElement;
-  // }
-
   drawAxisXLabels() {
     const svgGroupElement = this.createSvgElement('g');
 
     this.axisXLabels.forEach((axisLabel, index) => {
-      svgGroupElement.appendChild(this.createAxisLabels(axisLabel, index));
+      svgGroupElement.appendChild(this.createAxisXLabels(axisLabel, index));
     });
 
     return svgGroupElement;
   }
 
-  createAxisLabels(axisLabel, index) {
+  createAxisXLabels(axisLabel, index) {
     const svgTextElement = this.createSvgElement('text');
     const points = this.calculateAxisXLabelsPoints(axisLabel, index);
 
@@ -132,17 +123,44 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     const yCoordinate = this.svgInternalAreaHeight - this.svgInternalAreaHeight * ratio + Padding;
 
     return [xCoordinate.toString(), yCoordinate.toString()];
-
-    // const y = height - padding + FONT_SIZE * 2;
   }
 
-  // const startX = Padding * 3;
-  // const endX = this.svgWidth - Padding;
+  drawAxisYLabels() {
+    const svgGroupElement = this.createSvgElement('g');
 
-  // const ratio = index / (this.numberOfHorizontalGuides - 1);
-  // const yCoordinate = this.svgInternalAreaHeight - (this.svgInternalAreaHeight * ratio) + Padding;
+    this.categories.forEach((category, index) => {
+      svgGroupElement.appendChild(this.createAxisYLabels(category, index));
+    });
 
-  // return `${startX}, ${yCoordinate}, ${endX}, ${yCoordinate}`;
+    return svgGroupElement;
+  }
+
+  createAxisYLabels(axisLabel, index) {
+    const svgTextElement = this.createSvgElement('text');
+    const points = this.calculateAxisYLabelsPoints(axisLabel, index);
+
+    svgTextElement.textContent = axisLabel.toString();
+
+    this.renderer.setAttribute(svgTextElement, 'key', `axis-label-value-${index + 1}`);
+    this.renderer.setAttribute(svgTextElement, 'x', points[0]);
+    this.renderer.setAttribute(svgTextElement, 'y', points[1]);
+    this.renderer.setAttribute(svgTextElement, 'text-anchor', 'middle');
+    this.renderer.setAttribute(svgTextElement, 'font-weight', '600');
+    this.renderer.setAttribute(svgTextElement, 'font-size', '12');
+
+    return svgTextElement;
+  }
+
+  calculateAxisYLabelsPoints(axisLabel, index) {
+    const textPadding = 8;
+
+    const yCoordinate = this.svgHeight - textPadding;
+
+    const ratio = index / (this.categories.length - 1);
+    const xCoordinate = Padding * 5 + ratio * this.svgInternalAreaWidth;
+
+    return [xCoordinate.toString(), yCoordinate.toString()];
+  }
 
   drawOuterAxisY() {
     const svgGroupElement = this.createSvgElement('g');
@@ -190,7 +208,7 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
 
   setPolylineYOuterPoints(index) {
     const startY = Padding;
-    const endY = this.svgHeight - Padding * 2;
+    const endY = this.svgHeight - Padding;
 
     const outerXCoordinate = index === 0 ? Padding * 3 : this.svgWidth - Padding;
 
@@ -199,7 +217,7 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
 
   setPolylineYPoints(index) {
     const startY = Padding;
-    const endY = this.svgHeight - Padding * 2;
+    const endY = this.svgHeight - Padding;
 
     const ratio = index / (this.categories.length - 1);
     const xCoordinate = Padding * 5 + ratio * this.svgInternalAreaWidth;
@@ -221,7 +239,6 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     this.calculateSVGContainerSize(this.chartWrapper, this.chartHeader, this.chartLegend);
     this.calculateSeriesMaxValue();
     this.defineAxisXLabels(this.maxValue, this.numberOfHorizontalGuides);
-    this.calculatePoints();
   }
 
   calculateSVGContainerSize(chartWrapperElement: number, chartHeaderElement: number, chartLegendElement: number) {
@@ -234,7 +251,7 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     // Largura que subtrai a largura do container SVG pelo padding lateral, área de labelY e margem interna do grid.
     this.svgInternalAreaWidth = this.svgWidth - Padding * 8;
     // Altura que subtrai a altura do container SVG pelo padding superior, inferior e área de labelX.
-    this.svgInternalAreaHeight = this.svgHeight - Padding * 3;
+    this.svgInternalAreaHeight = this.svgHeight - Padding * 2;
   }
 
   calculateSeriesMaxValue() {
@@ -243,7 +260,7 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
       this.series.map((serie: PoLineChartSeries) => {
         return Math.max.apply(
           Math,
-          serie.value.map((data: number) => {
+          serie.values.map((data: number) => {
             return data;
           })
         );
@@ -251,52 +268,45 @@ export class PoChartLineComponent extends PoChartDynamicTypeComponent implements
     );
 
     this.maxValue = Math.ceil(maxDataValue / 100) * 100;
-
-    // calcMaxValue : function(){
-    //   this.maxValue = 0;
-    //   for(x=0; x < this.values.length; x++){
-    //     if(this.values[x] > this.maxValue){
-    //       this.maxValue = this.values[x];
-    //     }
-    //   }
-    //   // Round up to next integer
-    //   this.maxValue = Math.ceil(this.maxValue);
-    // }
   }
 
-  calculatePoints() {
-    this.series.forEach((serie: PoLineChartSeries) => {
-      let steps = 100 / serie.value.length - 1;
-      let points = '';
-      serie.value.forEach((data, index) => {
-        let percentage = data / this.maxValue;
-        let point = `${(steps * index).toFixed(2)},${(this.svgHeight - this.svgHeight * percentage).toFixed(2)} `;
-        points += point;
-      });
+  drawSeries() {
+    const svgGroupElement = this.createSvgElement('g');
 
-      this.points = [...this.points, { coordinates: points }];
+    this.series.forEach((serie, index) => {
+      const svgPathElement = this.createSvgElement('polyline');
+
+      this.renderer.setAttribute(svgPathElement, 'key', `polyline-${index + 1}`);
+      this.renderer.setAttribute(svgPathElement, 'class', `animae${index}`);
+      this.renderer.setAttribute(svgPathElement, 'points', `${this.seriePointsDefinition(serie)}`);
+      this.renderer.setAttribute(svgPathElement, 'stroke', 'red');
+      this.renderer.setAttribute(svgPathElement, 'stroke-width', '2');
+      this.renderer.setAttribute(svgPathElement, 'fill', 'transparent');
+      // this.renderer.setAttribute(svgPathElement, 'fill-opacity', '.1');
+
+      svgGroupElement.appendChild(svgPathElement);
     });
-    // calcPoints : function(){
-    //   this.points = [];
-    //   if(this.values.length > 1){
-    //     // First point is bottom left hand side (max value is the bottom of graph)
-    //     var points = "0," + chart.height + " ";
-    //     // Loop through each value
-    //     for(x=0; x < this.values.length; x++){
-    //       // Calculate the perecentage of this value/the max value
-    //       var perc  = this.values[x] / this.maxValue;
-    //       // Steps is a percentage (100) / the total amount of values
-    //       var steps = 100 / ( this.values.length - 1 );
-    //       // Create the point, limit points to 2 decimal points,
-    //       // Y co-ord is calculated by the taking the chart height,
-    //       // then subtracting (chart height * the percentage of this point)
-    //       // Remember the & co-ord is measured from the top not the bottom like a traditional graph
-    //       var point = (steps * (x )).toFixed(2) + "," + (this.height - (this.height * perc)).toFixed(2) + " ";
-    //       // Add this point
-    //       points += point;
-    //     }
-    //     // Add the final point (bottom right)
-    //     points += "100," + this.height;
-    //     this.points = points;
+
+    return svgGroupElement;
+  }
+
+  seriePointsDefinition(serie: PoLineChartSeries) {
+    let points = '';
+
+    serie.values.forEach((data, index) => {
+      const hasComma = index ? ', ' : '';
+
+      // eixo X
+      const ratioX = index / (this.categories.length - 1);
+      const xCoordinate = ratioX * this.svgInternalAreaWidth + Padding * 5;
+
+      // eixo Y
+      const ratioY = data / this.maxValue;
+      const yCoordinate = this.svgInternalAreaHeight - this.svgInternalAreaHeight * ratioY + Padding;
+
+      points += `${hasComma}${xCoordinate} ${yCoordinate}`;
+    });
+
+    return points;
   }
 }
