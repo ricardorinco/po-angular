@@ -16,7 +16,7 @@ export abstract class PoChartDynamicTypeComponent {
   protected windowResizeListener: () => void;
   protected windowScrollListener: () => void;
   // tslint:disable-next-line: use-type-alias
-  protected _series: Array<PoPieChartSeries | PoDonutChartSeries | PoChartGaugeSerie> = [];
+  protected _series: Array<any> = [];
 
   centerX: number;
   chartElementCategory: any;
@@ -30,7 +30,6 @@ export abstract class PoChartDynamicTypeComponent {
   innerRadius: number = 0;
   onSerieClick: Subject<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie | PoLineChartSeries> = new Subject();
   onSerieHover: Subject<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie | PoLineChartSeries> = new Subject();
-  series: Array<any> = [];
   svgElement: HTMLObjectElement;
   svgHeight: number;
   svgWidth: number;
@@ -62,7 +61,7 @@ export abstract class PoChartDynamicTypeComponent {
         : this.series.reduce((previousValue, serie) => previousValue + serie.value, 0);
   }
 
-  set series(value: Array<PoPieChartSeries | PoDonutChartSeries | PoChartGaugeSerie>) {
+  set series(value: Array<any>) {
     this._series = this.getSeriesWithValue(value);
   }
 

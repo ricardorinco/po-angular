@@ -22,5 +22,7 @@ export enum PoChartType {
    */
   Pie = 'pie',
 
-  Line = 'line'
+  Line = 'line',
+
+  Bar = 'bar'
 }

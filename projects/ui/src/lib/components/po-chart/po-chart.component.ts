@@ -24,6 +24,7 @@ import { PoChartDynamicTypeComponent } from './po-chart-types/po-chart-dynamic-t
 import { PoChartGaugeComponent } from './po-chart-types/po-chart-gauge/po-chart-gauge.component';
 import { PoChartPieComponent } from './po-chart-types/po-chart-pie/po-chart-pie.component';
 import { PoChartType } from './enums/po-chart-type.enum';
+import { PoChartBarComponent } from './po-chart-types/po-chart-bar/po-chart-bar.component';
 
 /**
  * @docsExtends PoChartBaseComponent
@@ -60,7 +61,8 @@ export class PoChartComponent extends PoChartBaseComponent implements AfterViewI
     [PoChartType.Donut]: PoChartDonutComponent,
     [PoChartType.Gauge]: PoChartGaugeComponent,
     [PoChartType.Line]: PoChartLineComponent,
-    [PoChartType.Pie]: PoChartPieComponent
+    [PoChartType.Pie]: PoChartPieComponent,
+    [PoChartType.Bar]: PoChartBarComponent
   };
 
   colors: Array<string> = [];
@@ -148,7 +150,6 @@ export class PoChartComponent extends PoChartBaseComponent implements AfterViewI
     const instance = <PoChartDynamicTypeComponent>this.componentRef.instance;
 
     this.setChartProperties(instance);
-
     return instance;
   }
 
