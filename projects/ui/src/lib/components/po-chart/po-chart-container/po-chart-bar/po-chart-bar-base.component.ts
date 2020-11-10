@@ -83,8 +83,8 @@ export abstract class PoChartBarBaseComponent {
   private getDomainValues(options: PoChartAxisOptions = {}): void {
     this.minMaxSeriesValues = this.mathsService.calculateMinAndMaxValues(this._series);
 
-    const minValue =
-      options.minRange < this.minMaxSeriesValues.minValue ? options.minRange : this.minMaxSeriesValues.minValue;
+    // TO DO: tratamento para valores negativos.
+    const minValue = 0;
     const maxValue =
       options.maxRange > this.minMaxSeriesValues.maxValue ? options.maxRange : this.minMaxSeriesValues.maxValue;
     const minMaxUpdatedValues = { minValue, maxValue };
