@@ -14,9 +14,8 @@ import { PoChartBarCoordinates } from '../../interfaces/po-chart-bar-coordinates
 export abstract class PoChartBarBaseComponent {
   colors: Array<string>;
   seriesPathsCoordinates: Array<Array<PoChartBarCoordinates>>;
-  // seriesPointsCoordinates: Array<Array<PoChartBarCoordinates>> = [];
 
-  protected serieItemLength: number;
+  protected seriesGreaterLength: number;
 
   private minMaxSeriesValues: PoChartMinMaxValues;
   private firstValidItemFromSerieArray: boolean;
@@ -31,7 +30,7 @@ export abstract class PoChartBarBaseComponent {
     this._containerSize = value;
 
     this.getDomainValues(this.options);
-    this.seriePathPointsDefinition(this._containerSize, this.series, this.minMaxSeriesValues);
+    this.calculateSeriesPathsCoordinates(this._containerSize, this.series, this.minMaxSeriesValues);
   }
 
   get containerSize() {
@@ -45,10 +44,10 @@ export abstract class PoChartBarBaseComponent {
 
     if (seriesDataArrayFilter.length) {
       this._series = seriesDataArrayFilter;
-      this.serieItemLength = this.mathsService.seriesGreaterLength(this.series);
+      this.seriesGreaterLength = this.mathsService.seriesGreaterLength(this.series);
       this.colors = this.colorService.getSeriesColor(this._series, PoChartType.Column);
       this.getDomainValues(this.options);
-      this.seriePathPointsDefinition(this.containerSize, seriesDataArrayFilter, this.minMaxSeriesValues);
+      this.calculateSeriesPathsCoordinates(this.containerSize, seriesDataArrayFilter, this.minMaxSeriesValues);
     } else {
       this._series = [];
     }
@@ -63,7 +62,7 @@ export abstract class PoChartBarBaseComponent {
       this._options = value;
 
       this.getDomainValues(this.options);
-      this.seriePathPointsDefinition(this.containerSize, this._series, this.minMaxSeriesValues);
+      this.calculateSeriesPathsCoordinates(this.containerSize, this._series, this.minMaxSeriesValues);
     }
   }
 
@@ -96,24 +95,19 @@ export abstract class PoChartBarBaseComponent {
     };
   }
 
-  private seriePathPointsDefinition(
+  private calculateSeriesPathsCoordinates(
     containerSize: PoChartContainerSize,
     series: Array<PoBarChartSeries>,
     minMaxSeriesValues: PoChartMinMaxValues
   ) {
-    // this.seriesPointsCoordinates = [];
-
     this.seriesPathsCoordinates = series.map((serie: PoBarChartSeries, seriesIndex) => {
       if (Array.isArray(serie.data)) {
-        // let pathCoordinates: string = '';
-        let pointCoordinates: Array<PoChartBarCoordinates> = [];
+        let pathCoordinates: Array<PoChartBarCoordinates> = [];
         this.firstValidItemFromSerieArray = true;
 
         serie.data.forEach((serieValue, serieDataIndex) => {
           if (this.mathsService.verifyIfFloatOrInteger(serieValue)) {
-            const svgPathCommand = this.svgPathCommand();
-
-            const coordinates = this.coordinates(
+            const coordinates = this.barCoordinates(
               seriesIndex,
               serieDataIndex,
               containerSize,
@@ -121,24 +115,17 @@ export abstract class PoChartBarBaseComponent {
               serieValue
             );
 
-            // const xCoordinate = this.xCoordinate(index, containerSize);
-            // const yCoordinate = this.yCoordinate(minMaxSeriesValues, serieValue, containerSize);
             const category = this.serieCategory(seriesIndex, this.categories);
             const label = serie['label'];
             const tooltipLabel = this.serieLabel(serieValue, label);
 
-            // pathCoordinates = coordinates;
-            pointCoordinates = [...pointCoordinates, { category, label, tooltipLabel, data: serieValue, coordinates }];
-            // pathCoordinates += ` ${svgPathCommand}${xCoordinate} ${yCoordinate}`;
+            pathCoordinates = [...pathCoordinates, { category, label, tooltipLabel, data: serieValue, coordinates }];
           }
         });
-        // this.seriesPointsCoordinates = [...this.seriesPointsCoordinates, pointCoordinates];
 
-        return pointCoordinates;
+        return pathCoordinates;
       }
     });
-
-    console.log('seriesPathsCoordinates:::', this.seriesPathsCoordinates);
   }
 
   private serieCategory(index: number, categories: Array<string> = []) {
@@ -151,22 +138,11 @@ export abstract class PoChartBarBaseComponent {
     return hasLabel ? `${label}: ${serieValue}` : serieValue.toString();
   }
 
-  private svgPathCommand() {
-    const command = this.firstValidItemFromSerieArray ? 'M' : 'L';
-    // firstValidItemFromSerieArray: tratamento para permitir ao usuário definir o primeiro valor como null para que seja ignorado;
-    this.firstValidItemFromSerieArray = false;
-
-    return command;
-  }
-
-  protected abstract coordinates(
+  protected abstract barCoordinates(
     seriesIndex: number,
     serieDataIndex: number,
     containerSize: PoChartContainerSize,
     minMaxSeriesValues: PoChartMinMaxValues,
     serieValue: number
   );
-
-  // protected abstract xCoordinate(index: number, containerSize: PoChartContainerSize);
-  // protected abstract yCoordinate(minMaxSeriesValues: PoChartMinMaxValues, serieValue: number, containerSize: PoChartContainerSize);
 }
