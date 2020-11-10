@@ -1,0 +1,28 @@
+<svg:path *ngFor="let item of coordinates; trackBy: trackBy"
+  class="po-chart-bar-path"
+  [attr.fill]="color"
+  [attr.d]="item.coordinates">
+</svg:path> 
+
+<!-- <svg:circle *ngFor="let item of coordinates; trackBy: trackBy" 
+  [p-tooltip]="item.tooltipLabel"
+  p-tooltip-position="top"
+  [p-append-in-body]='true'
+  class="po-chart-line-point"
+  [attr.cx]="item.xCoordinate"
+  [attr.cy]="item.yCoordinate"
+  [attr.r]="radius"
+  [attr.stroke]="color"
+  (click)="onClick(item)"
+  (mouseenter)="onMouseEnter($event, item)"
+  (mouseleave)="onMouseLeave($event)"
+  >
+</svg:circle> -->
+
+
+<!-- <svg:path
+  class="po-chart-line-path"
+  [attr.stroke]="color"
+  [attr.d]="coordinates">
+</svg:path>  -->
+

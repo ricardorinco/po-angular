@@ -6,6 +6,7 @@ import { PoTooltipModule } from '../../directives/po-tooltip/po-tooltip.module';
 import { PoChartAxisComponent } from './po-chart-container/po-chart-axis/po-chart-axis.component';
 import { PoChartAxisPathComponent } from './po-chart-container/po-chart-axis/po-chart-axis-path/po-chart-axis-path.component';
 import { PoChartAxisLabelComponent } from './po-chart-container/po-chart-axis/po-chart-axis-label/po-chart-axis-label.component';
+import { PoChartColumnComponent } from './po-chart-container/po-chart-bar/po-chart-column/po-chart-column.component';
 import { PoChartComponent } from './po-chart.component';
 import { PoChartContainerComponent } from './po-chart-container/po-chart-container.component';
 import { PoChartDonutComponent } from './po-chart-types/po-chart-donut/po-chart-donut.component';
@@ -16,6 +17,7 @@ import { PoChartLineComponent } from './po-chart-container/po-chart-line/po-char
 import { PoChartPathComponent } from './po-chart-container/po-chart-line/po-chart-path/po-chart-path.component';
 import { PoChartPieComponent } from './po-chart-types/po-chart-pie/po-chart-pie.component';
 import { PoChartSeriesPointComponent } from './po-chart-container/po-chart-line/po-chart-series-point/po-chart-series-point.component';
+import { PoChartBarPathComponent } from './po-chart-container/po-chart-bar/po-chart-bar-path/po-chart-bar-path.component';
 
 /**
  * @description
@@ -37,7 +39,9 @@ import { PoChartSeriesPointComponent } from './po-chart-container/po-chart-line/
     PoChartLineComponent,
     PoChartPathComponent,
     PoChartPieComponent,
-    PoChartSeriesPointComponent
+    PoChartSeriesPointComponent,
+    PoChartColumnComponent,
+    PoChartBarPathComponent
   ],
   exports: [PoChartComponent]
 })

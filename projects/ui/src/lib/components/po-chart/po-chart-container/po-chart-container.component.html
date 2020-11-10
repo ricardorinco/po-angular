@@ -16,7 +16,20 @@
 
   <!-- chart line -->
   <svg:g
+    *ngIf="type === 'line'"
     po-chart-line
+    [p-categories]="categories"
+    [p-series]="series"
+    [p-options]="axisOptions"
+    [p-container-size]="containerSize"
+    (p-point-hover)="onSerieHover($event)"
+    (p-point-click)="onSerieClick($event)"
+  ></svg:g>
+
+  <!-- chart column -->
+  <svg:g
+    *ngIf="type === 'column'"
+    po-chart-column
     [p-categories]="categories"
     [p-series]="series"
     [p-options]="axisOptions"

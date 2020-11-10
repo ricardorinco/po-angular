@@ -3,9 +3,9 @@
  *
  * @description
  *
- * Interface que define o objeto da série `PoChartType.Line`.
+ * Interface que define o objeto das séries de `PoChartType.Column`.
  */
-export interface PoLineChartSeries {
+export interface PoBarChartSeries {
   /** Define o texto da série. */
   label: string;
 

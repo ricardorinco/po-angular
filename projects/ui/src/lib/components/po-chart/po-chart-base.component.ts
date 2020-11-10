@@ -4,6 +4,7 @@ import { convertToInt, isTypeof } from '../../utils/util';
 
 import { PoChartGaugeSerie } from './po-chart-types/po-chart-gauge/po-chart-gauge-series.interface';
 import { PoChartType } from './enums/po-chart-type.enum';
+import { PoBarChartSeries } from './interfaces/po-chart-bar-series.interface';
 import { PoDonutChartSeries } from './po-chart-types/po-chart-donut/po-chart-donut-series.interface';
 import { PoPieChartSeries } from './po-chart-types/po-chart-pie/po-chart-pie-series.interface';
 import { PoLineChartSeries } from './interfaces/po-chart-line-series.interface';
@@ -13,7 +14,9 @@ const poChartDefaultHeight = 400;
 const poChartMinHeight = 200;
 const poChartTypeDefault = PoChartType.Pie;
 
-export type PoChartSeries = Array<PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie | PoLineChartSeries>;
+export type PoChartSeries = Array<
+  PoDonutChartSeries | PoPieChartSeries | PoChartGaugeSerie | PoLineChartSeries | PoBarChartSeries
+>;
 
 /**
  * @description
@@ -36,7 +39,9 @@ export abstract class PoChartBaseComponent {
   private _options: PoChartOptions;
   private _categories: Array<string>;
   private _height: number;
-  private _series: Array<PoDonutChartSeries | PoPieChartSeries | PoLineChartSeries> | PoChartGaugeSerie;
+  private _series:
+    | Array<PoDonutChartSeries | PoPieChartSeries | PoLineChartSeries | PoBarChartSeries>
+    | PoChartGaugeSerie;
   private _type: PoChartType = poChartTypeDefault;
 
   // manipulação das séries tratadas internamente para preservar 'p-series';
@@ -91,7 +96,7 @@ export abstract class PoChartBaseComponent {
    * - `PoChartGaugeSerie`
    */
   @Input('p-series') set series(
-    value: PoChartGaugeSerie | Array<PoDonutChartSeries | PoPieChartSeries | PoLineChartSeries>
+    value: PoChartGaugeSerie | Array<PoDonutChartSeries | PoPieChartSeries | PoLineChartSeries | PoBarChartSeries>
   ) {
     this._series = value || [];
 
