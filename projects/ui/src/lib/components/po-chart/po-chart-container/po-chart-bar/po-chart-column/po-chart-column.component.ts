@@ -1,11 +1,6 @@
 import { Component } from '@angular/core';
 
-import {
-  PoChartAxisXLabelArea,
-  PoChartExternalBarMargim,
-  PoChartPlotAreaPaddingTop,
-  PoChartSpaceBetweenBars
-} from '../../../helpers/po-chart-default-values.constant';
+import { PoChartAxisXLabelArea, PoChartPlotAreaPaddingTop } from '../../../helpers/po-chart-default-values.constant';
 
 import { PoChartBarBaseComponent } from '../po-chart-bar-base.component';
 import { PoChartColorService } from '../../../services/po-chart-color.service';
@@ -31,9 +26,9 @@ export class PoChartColumnComponent extends PoChartBarBaseComponent {
     serieValue: number
   ) {
     const { svgWidth, svgPlottingAreaHeight } = containerSize;
-    const { chartBarPlotArea, barWidth } = this.calculateElementsMeasurements(svgWidth);
+    const { chartBarPlotArea, barWidth, spaceBetweenBars } = this.calculateElementsMeasurements(svgWidth);
 
-    const { x1, x2 } = this.xCoordinates(seriesIndex, serieItemDataIndex, chartBarPlotArea, barWidth);
+    const { x1, x2 } = this.xCoordinates(seriesIndex, serieItemDataIndex, chartBarPlotArea, barWidth, spaceBetweenBars);
     const { y1, y2 } = this.yCoordinates(minMaxSeriesValues, svgPlottingAreaHeight, serieValue);
 
     const pathCoordinates = ['M', x1, y2, 'L', x2, y2, 'L', x2, y1, 'L', x1, y1, 'z'].join(' ');
@@ -42,24 +37,39 @@ export class PoChartColumnComponent extends PoChartBarBaseComponent {
   }
 
   private calculateElementsMeasurements(svgWidth: PoChartContainerSize['svgWidth']) {
+    // Fração das séries em relação à largura da categoria. Incrementa + 2 na extensão das séries pois se trata da área de margem entre as categorias.
     const chartBarPlotArea = svgWidth - PoChartAxisXLabelArea;
     const categoryWidth = chartBarPlotArea / this.seriesGreaterLength;
-    const barWidth =
-      (categoryWidth - PoChartSpaceBetweenBars * (this.series.length - 1) - PoChartExternalBarMargim * 2) /
-      this.series.length;
+    const columnFraction = categoryWidth / (this.series.length + 2);
 
-    return { chartBarPlotArea, barWidth };
+    // Área entre as colunas: retorna zero se houver apenas uma série.
+    const spaceBetweenBars = this.series.length > 1 ? columnFraction / (this.series.length + 2) : 0;
+
+    // Subtrai a fração das séries pelo espaço entre as colunas.
+    const barWidth = columnFraction - spaceBetweenBars / (this.series.length + 2);
+
+    return { chartBarPlotArea, barWidth, spaceBetweenBars };
   }
 
-  private xCoordinates(seriesIndex: number, serieItemDataIndex: number, chartBarPlotArea: number, barWidth: number) {
+  private xCoordinates(
+    seriesIndex: number,
+    serieItemDataIndex: number,
+    chartBarPlotArea: number,
+    barWidth: number,
+    spaceBetweenBars: number
+  ) {
+    // A área lateral entre a coluna e a linha do eixo Y do grid será sempre equivalente à largura da coluna.
+    const spaceBetweenAxisAndBars = barWidth;
     const indexDividedBySeriesLength = serieItemDataIndex / this.seriesGreaterLength;
     const xRatio = isNaN(indexDividedBySeriesLength) ? 0 : indexDividedBySeriesLength;
 
     const x1 =
       PoChartAxisXLabelArea +
       chartBarPlotArea * xRatio +
-      PoChartExternalBarMargim +
-      (barWidth * seriesIndex + PoChartSpaceBetweenBars * seriesIndex);
+      spaceBetweenAxisAndBars +
+      barWidth * seriesIndex +
+      spaceBetweenBars * seriesIndex;
+
     const x2 = x1 + barWidth;
 
     return { x1, x2 };
