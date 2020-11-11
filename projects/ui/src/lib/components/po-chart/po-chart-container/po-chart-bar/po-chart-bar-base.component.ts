@@ -18,7 +18,6 @@ export abstract class PoChartBarBaseComponent {
   protected seriesGreaterLength: number;
 
   private minMaxSeriesValues: PoChartMinMaxValues;
-  private firstValidItemFromSerieArray: boolean;
 
   private _containerSize: PoChartContainerSize = {};
   private _options: PoChartAxisOptions;
@@ -103,7 +102,6 @@ export abstract class PoChartBarBaseComponent {
     this.seriesPathsCoordinates = series.map((serie: PoBarChartSeries, seriesIndex) => {
       if (Array.isArray(serie.data)) {
         let pathCoordinates: Array<PoChartBarCoordinates> = [];
-        this.firstValidItemFromSerieArray = true;
 
         serie.data.forEach((serieValue, serieDataIndex) => {
           if (this.mathsService.verifyIfFloatOrInteger(serieValue)) {
