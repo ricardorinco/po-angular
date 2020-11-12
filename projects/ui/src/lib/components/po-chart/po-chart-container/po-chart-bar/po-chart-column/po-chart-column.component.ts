@@ -32,7 +32,6 @@ export class PoChartColumnComponent extends PoChartBarBaseComponent {
     const { y1, y2 } = this.yCoordinates(minMaxSeriesValues, svgPlottingAreaHeight, serieValue);
 
     const pathCoordinates = ['M', x1, y2, 'L', x2, y2, 'L', x2, y1, 'L', x1, y1, 'z'].join(' ');
-
     return pathCoordinates;
   }
 
@@ -60,17 +59,17 @@ export class PoChartColumnComponent extends PoChartBarBaseComponent {
   ) {
     // A área lateral entre a coluna e a linha do eixo Y do grid será sempre equivalente à largura da coluna.
     const spaceBetweenAxisAndBars = barWidth;
-    const indexDividedBySeriesLength = serieItemDataIndex / this.seriesGreaterLength;
-    const xRatio = isNaN(indexDividedBySeriesLength) ? 0 : indexDividedBySeriesLength;
+    const xRatio = serieItemDataIndex / this.seriesGreaterLength;
 
-    const x1 =
+    const x1 = Math.round(
       PoChartAxisXLabelArea +
-      chartBarPlotArea * xRatio +
-      spaceBetweenAxisAndBars +
-      barWidth * seriesIndex +
-      spaceBetweenBars * seriesIndex;
+        chartBarPlotArea * xRatio +
+        spaceBetweenAxisAndBars +
+        barWidth * seriesIndex +
+        spaceBetweenBars * seriesIndex
+    );
 
-    const x2 = x1 + barWidth;
+    const x2 = Math.round(x1 + barWidth);
 
     return { x1, x2 };
   }
@@ -80,8 +79,8 @@ export class PoChartColumnComponent extends PoChartBarBaseComponent {
     const filterNegativeSerieValue = serieValue <= 0 ? 0 : serieValue;
 
     const yRatio = this.mathsService.getSeriePercentage(minMaxSeriesValues, filterNegativeSerieValue);
-    const y1 = svgPlottingAreaHeight + PoChartPlotAreaPaddingTop;
-    const y2 = svgPlottingAreaHeight - svgPlottingAreaHeight * yRatio + PoChartPlotAreaPaddingTop;
+    const y1 = Math.round(svgPlottingAreaHeight + PoChartPlotAreaPaddingTop);
+    const y2 = Math.round(svgPlottingAreaHeight - svgPlottingAreaHeight * yRatio + PoChartPlotAreaPaddingTop);
 
     return { y1, y2 };
   }

@@ -1,5 +1,4 @@
 <svg:g>
-
   <svg:g *ngFor="let item of seriesPathsCoordinates; let i = index; trackBy: trackBy"
     [class]="'po-chart-bar-group-' + i"
   >
@@ -11,5 +10,4 @@
       >
       </svg:g>
   </svg:g>
-
 </svg:g>

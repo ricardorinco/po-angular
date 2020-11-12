@@ -113,7 +113,7 @@ export abstract class PoChartBarBaseComponent {
               serieValue
             );
 
-            const category = this.serieCategory(seriesIndex, this.categories);
+            const category = this.serieCategory(serieDataIndex, this.categories);
             const label = serie['label'];
             const tooltipLabel = this.serieLabel(serieValue, label);
 

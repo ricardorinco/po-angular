@@ -9,7 +9,7 @@ import { PoChartBarCoordinates } from '../../../interfaces/po-chart-bar-coordina
 export class PoChartBarPathComponent {
   @Input('p-color') color?: string;
 
-  @Input('p-coordinates') coordinates: PoChartBarCoordinates;
+  @Input('p-coordinates') coordinates: Array<PoChartBarCoordinates>;
 
   constructor() {}
 

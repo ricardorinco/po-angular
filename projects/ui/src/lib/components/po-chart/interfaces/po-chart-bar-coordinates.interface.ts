@@ -21,5 +21,5 @@ export interface PoChartBarCoordinates {
   data: number;
 
   /** Coordenadas da coluna. */
-  coordinates: number;
+  coordinates: string;
 }
