@@ -13,6 +13,7 @@ import { PoChartMinMaxValues } from '../../interfaces/po-chart-min-max-values.in
 import { PoChartPathCoordinates } from '../../interfaces/po-chart-path-coordinates.interface';
 import { PoChartAxisLabelCoordinates } from '../../interfaces/po-chart-axis-label-coordinates.interface';
 import { PoChartAxisOptions } from '../../interfaces/po-chart-axis-options.interface';
+import { PoChartType } from '../../enums/po-chart-type.enum';
 
 @Component({
   selector: '[po-chart-axis]',
@@ -27,11 +28,13 @@ export class PoChartAxisComponent {
   private axisXGridLines: number = PoChartAxisXGridLines;
   private minMaxAxisValues: PoChartMinMaxValues;
   private seriesLength: number = 0;
+  private hasAxisSideSpacing: boolean;
 
   private _axisOptions: PoChartAxisOptions;
   private _categories: Array<string> = [];
   private _containerSize: PoChartContainerSize = {};
   private _series: Array<any> = [];
+  private _type: PoChartType;
 
   @Input('p-series') set series(seriesList: Array<any>) {
     const seriesDataArrayFilter = seriesList.filter(serie => {
@@ -91,6 +94,15 @@ export class PoChartAxisComponent {
     return this._axisOptions;
   }
 
+  @Input('p-type') set type(value: PoChartType) {
+    this._type = value;
+    this.hasAxisSideSpacing = this._type === PoChartType.Line;
+  }
+
+  get type() {
+    return this._type;
+  }
+
   constructor(private mathsService: PoChartMathsService) {}
 
   private setAxisXCoordinates(axisXGridLines: number, containerSize: PoChartContainerSize) {
@@ -128,14 +140,20 @@ export class PoChartAxisComponent {
     return removeZeroDigits.toString();
   }
 
-  private setAxisYCoordinates(containerSize: PoChartContainerSize, seriesLength: number) {
+  private setAxisYCoordinates(containerSize, seriesLength) {
+    return this.hasAxisSideSpacing
+      ? this.setAxisYCoordinatesWithSideSpacing(containerSize, seriesLength)
+      : this.setAxisYCoordinatesWithoutSideSpacing(containerSize, seriesLength);
+  }
+
+  private setAxisYCoordinatesWithSideSpacing(containerSize: PoChartContainerSize, seriesLength: number) {
     const startY = PoChartPlotAreaPaddingTop;
     const endY = containerSize.svgPlottingAreaHeight + PoChartPlotAreaPaddingTop;
 
     const outerYCoordinates = this.setAxisYOuterCoordinates(startY, endY, containerSize);
 
     const innerYCoordinates = [...Array(seriesLength)].map((_, index: number) => {
-      const xCoordinate = this.calculateAxisYCoordinateX(containerSize, index);
+      const xCoordinate = this.calculateAxisYCoordinateXWithSideSpacing(containerSize, index);
 
       const coordinates = `M${xCoordinate} ${startY} L${xCoordinate}, ${endY}`;
 
@@ -143,6 +161,24 @@ export class PoChartAxisComponent {
     });
 
     this.axisYCoordinates = [...outerYCoordinates, ...innerYCoordinates];
+  }
+
+  private setAxisYCoordinatesWithoutSideSpacing(containerSize: PoChartContainerSize, seriesLength: number) {
+    const startY = PoChartPlotAreaPaddingTop;
+    const endY = containerSize.svgPlottingAreaHeight + PoChartPlotAreaPaddingTop;
+
+    // tratamento necessário para cirar uma linha a mais para fechar o gráfico
+    const lenght = seriesLength === 0 ? seriesLength : seriesLength + 1;
+
+    const innerYCoordinates = [...Array(lenght)].map((_, index: number) => {
+      const xCoordinate = this.calculateAxisYCoordinateX(containerSize, index);
+
+      const coordinates = `M${xCoordinate} ${startY} L${xCoordinate}, ${endY}`;
+
+      return { coordinates };
+    });
+
+    this.axisYCoordinates = [...innerYCoordinates];
   }
 
   private setAxisYOuterCoordinates(startY: number, endY: number, containerSize: PoChartContainerSize) {
@@ -164,7 +200,7 @@ export class PoChartAxisComponent {
     this.axisYLabelCoordinates = [...Array(seriesLength)].map((_, index: number) => {
       const label = categories[index] ?? '-';
 
-      const xCoordinate = this.calculateAxisYCoordinateX(containerSize, index);
+      const xCoordinate = this.calculateAxisYCoordinateXWithSideSpacing(containerSize, index);
       const yCoordinate = this.calculateAxisYLabelYCoordinate(containerSize);
 
       return { label, xCoordinate, yCoordinate };
@@ -195,12 +231,18 @@ export class PoChartAxisComponent {
     return containerSize.svgHeight - textPoChartPadding;
   }
 
-  private calculateAxisYCoordinateX(containerSize: PoChartContainerSize, index: number): number {
+  private calculateAxisYCoordinateXWithSideSpacing(containerSize: PoChartContainerSize, index: number): number {
     const divideIndexBySeriesLength = index / (this.seriesLength - 1);
     const xRatio = isNaN(divideIndexBySeriesLength) ? 0 : divideIndexBySeriesLength;
     const svgAxisSideSpacing = this.mathsService.calculateSideSpacing(containerSize.svgWidth, this.seriesLength);
-
     return PoChartAxisXLabelArea + svgAxisSideSpacing + containerSize.svgPlottingAreaWidth * xRatio;
+  }
+
+  private calculateAxisYCoordinateX(containerSize: PoChartContainerSize, index: number): number {
+    const divideIndexBySeriesLength = index / this.seriesLength;
+    const xRatio = divideIndexBySeriesLength === Infinity ? 0 : divideIndexBySeriesLength;
+
+    return PoChartAxisXLabelArea + (containerSize.svgPlottingAreaWidth + PoChartPadding * 2) * xRatio;
   }
 
   private checkAxisOptions(options: PoChartAxisOptions = {}): void {
