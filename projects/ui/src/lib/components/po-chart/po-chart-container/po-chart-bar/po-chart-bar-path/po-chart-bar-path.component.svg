@@ -4,5 +4,7 @@
   [p-append-in-body]='true'
   class="po-chart-bar-path"
   [attr.fill]="color"
-  [attr.d]="item.coordinates">
+  [attr.d]="item.coordinates"
+  (mouseenter)="onMouseEnter(item)"
+  (click)="onClick(item)">
 </svg:path> 

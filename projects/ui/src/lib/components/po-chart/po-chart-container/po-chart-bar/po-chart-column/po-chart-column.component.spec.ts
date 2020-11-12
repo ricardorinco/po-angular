@@ -77,7 +77,7 @@ describe('PoChartColumnComponent', () => {
           minMaxSeriesValues,
           serieValue
         );
-        expect(expectedResult).toBe('M 82 28 L 92 28 L 92 28 L 82 28 z');
+        expect(expectedResult).toBe('M 86 37 L 100 37 L 100 28 L 86 28 z');
       });
     });
 
@@ -114,7 +114,7 @@ describe('PoChartColumnComponent', () => {
         minMaxSeriesValues,
         serieValue
       );
-      expect(expectedResult).toBe('M 82 29 L 92 29 L 92 28 L 82 28 z');
+      expect(expectedResult).toBe('M 86 38 L 100 38 L 100 28 L 86 28 z');
     });
   });
 });

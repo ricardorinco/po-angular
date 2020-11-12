@@ -36,6 +36,36 @@ describe('PoChartBarPathComponent', () => {
   });
 
   describe('Methods:', () => {
+    it('onClick: should emit `barClick` with an object with `label`, `data` and `category`', () => {
+      const spyBarClick = spyOn(component.barClick, 'emit');
+
+      component.onClick(coordinates);
+
+      const expectedParam = {
+        label: coordinates.label,
+        data: coordinates.data,
+        category: coordinates.category
+      };
+
+      expect(spyBarClick).toHaveBeenCalledWith(expectedParam);
+    });
+
+    it('onMouseEnter: should emit `barHover` with an object with `category`, `value` and `axisCategory`', () => {
+      const event = { target: { r: '2', fill: 'red' } };
+
+      const spyBarHover = spyOn(component.barHover, 'emit');
+
+      component.onMouseEnter(coordinates);
+
+      const expectedParam = {
+        label: coordinates.label,
+        data: coordinates.data,
+        category: coordinates.category
+      };
+
+      expect(spyBarHover).toHaveBeenCalledWith(expectedParam);
+    });
+
     it('trackBy: should return index param', () => {
       const index = 1;
       const expectedValue = index;

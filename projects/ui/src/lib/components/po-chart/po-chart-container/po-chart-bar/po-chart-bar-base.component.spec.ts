@@ -41,6 +41,26 @@ describe('PoChartBarBaseComponent', () => {
   });
 
   describe('Methods:', () => {
+    it('onSerieBarClick: should emit `barClick`', () => {
+      const selectedItem = { label: 'cat', data: 200 };
+
+      const spyBarClick = spyOn(component.barClick, 'emit');
+
+      component.onSerieBarClick(selectedItem);
+
+      expect(spyBarClick).toHaveBeenCalledWith(selectedItem);
+    });
+
+    it('onSerieBarHover: should emit `BarHover`', () => {
+      const selectedItem = { label: 'Vancouver', data: 200 };
+
+      const spyBarHover = spyOn(component.barHover, 'emit');
+
+      component.onSerieBarHover(selectedItem);
+
+      expect(spyBarHover).toHaveBeenCalledWith({ label: 'Vancouver', data: 200 });
+    });
+
     it('trackBy: should return index param', () => {
       const index = 1;
       const expectedValue = index;

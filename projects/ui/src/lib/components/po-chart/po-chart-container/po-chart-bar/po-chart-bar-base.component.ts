@@ -69,11 +69,19 @@ export abstract class PoChartBarBaseComponent {
     return this._options;
   }
 
-  @Output('p-point-click') pointClick = new EventEmitter<any>();
+  @Output('p-bar-click') barClick = new EventEmitter<any>();
 
-  @Output('p-point-hover') pointHover = new EventEmitter<any>();
+  @Output('p-bar-hover') barHover = new EventEmitter<any>();
 
   constructor(protected colorService: PoChartColorService, protected mathsService: PoChartMathsService) {}
+
+  onSerieBarClick(selectedItem: any) {
+    this.barClick.emit(selectedItem);
+  }
+
+  onSerieBarHover(selectedItem: any) {
+    this.barHover.emit(selectedItem);
+  }
 
   trackBy(index) {
     return index;

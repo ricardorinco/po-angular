@@ -11,7 +11,7 @@ import { PoChartMinMaxValues } from '../../../interfaces/po-chart-min-max-values
 
 @Component({
   selector: '[po-chart-column]',
-  templateUrl: './po-chart-column.component.svg'
+  templateUrl: '../po-chart-bar.component.svg'
 })
 export class PoChartColumnComponent extends PoChartBarBaseComponent {
   constructor(protected colorService: PoChartColorService, protected mathsService: PoChartMathsService) {
