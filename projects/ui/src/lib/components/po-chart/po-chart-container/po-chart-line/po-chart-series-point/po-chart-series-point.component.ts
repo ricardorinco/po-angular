@@ -1,4 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, Output, Renderer2 } from '@angular/core';
+import { from, Observable, timer } from 'rxjs';
+import { concatMap, mapTo, scan, tap } from 'rxjs/operators';
 
 import { PoChartPointsCoordinates } from '../../../interfaces/po-chart-points-coordinates.interface';
 
@@ -11,10 +13,28 @@ const RADIUS_HOVER_SIZE = 10;
 })
 export class PoChartSeriesPointComponent {
   radius: number = RADIUS_DEFAULT_SIZE;
+  coordinates$: Observable<any[]>;
+
+  private _coordinates: Array<PoChartPointsCoordinates> = [];
+  private animationState: boolean = true;
+
+  @Input('p-animate') animate: boolean;
 
   @Input('p-color') color?: string;
 
-  @Input('p-coordinates') coordinates: Array<PoChartPointsCoordinates>;
+  @Input('p-coordinates') set coordinates(value: Array<PoChartPointsCoordinates>) {
+    this._coordinates = value;
+
+    if (this.animationState) {
+      this.coordinates$ = this.displayPointsWithDelay(this._coordinates);
+    } else {
+      this.coordinates$ = from([this._coordinates]);
+    }
+  }
+
+  get coordinates() {
+    return this._coordinates;
+  }
 
   // Referência para o svgPathGroup ao qual pertence o ponto. Necessário para reordenação dos svgElements no DOM para tratamento onHover
   @Input('p-relative-to') relativeTo: string;
@@ -24,6 +44,16 @@ export class PoChartSeriesPointComponent {
   @Output('p-point-hover') pointHover = new EventEmitter<any>();
 
   constructor(private renderer: Renderer2, private elementRef: ElementRef) {}
+
+  private displayPointsWithDelay(coordinates: Array<PoChartPointsCoordinates>) {
+    const animationTimer = 700 / coordinates.length;
+
+    return from(coordinates).pipe(
+      concatMap((item, index) => timer(index === 0 || !this.animate ? 0 : animationTimer).pipe(mapTo(item))),
+      scan((acc, curr: PoChartPointsCoordinates) => acc.concat(curr), []),
+      tap(() => (this.animationState = false))
+    );
+  }
 
   trackBy(index) {
     return index;
